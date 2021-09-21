@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ItemSale;
 use App\Models\Product;
 use App\Models\ProductSale;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SaleController extends Controller
@@ -112,5 +113,42 @@ class SaleController extends Controller
     {
         ProductSale::findOrFail($id)->delete();
         return response()->json(["success" => true], 200);
+    }
+
+
+    public function sellItems (Request $request) {
+        $db_items = [];
+        // $invoice_id = $request->id;
+
+        $sellsItems = ItemSale::all();
+        $products = Product::all();
+        foreach($sellsItems as $item) {
+            
+
+                $db_items[] = [
+                    "product_name" => $this->checkId($products, $item->product_id),
+                    "rate" => $item->rate,
+                    "quantity" => $item->quantity,
+                    "amount" => $item->amount,
+                    "invoice_id" => $item->invoice_id,
+                ];
+            
+    
+    }
+    return response()->json(["sell_items" => $db_items]);
+    }
+
+
+    public function totalUser () {
+        $total = User::count();
+        return response()->json(["totalUser" => $total]);
+    }
+    public function totalOrder () {
+        $total = ProductSale::count();
+        return response()->json(["totalOrder" => $total]);
+    }
+    public function totalItems () {
+        $total = Product::count();
+        return response()->json(["totalProduct" => $total]);
     }
 }
