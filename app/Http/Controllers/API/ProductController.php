@@ -53,7 +53,16 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        
+        $this->validate($request, [
+            'name' => 'required|max:256, min:2',
+            'code'    => 'required',
+            'category_id' => 'required',
+            'unit_id' => 'required',
+            'quantity' => 'required',
+            'price' => 'required',
+            'alert_quantity' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
         Product::create($request->all());
 
         return response()->json(["success" => true], 200);

@@ -16,4 +16,7 @@ class Product extends Model
     public function units () {
         return $this->belongsTo(Unit::class);
     }
+    public function itemsalse () {
+        return $this->belongsTo(ItemSale::class);
+    }
 }

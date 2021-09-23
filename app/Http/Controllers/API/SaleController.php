@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductSell;
 use App\Models\ItemSale;
 use App\Models\Product;
 use App\Models\ProductSale;
@@ -40,52 +41,51 @@ class SaleController extends Controller
 
     public function index()
     {
-        $productSales = ProductSale::latest()->get();
-        $itemSells = ItemSale::all();
-
-        foreach ($productSales as $sale) {
-            $sells[] = [
-                "invoice_no" => $sale->invoice_no,
-                "name" => $sale->customer_name,
-                "phone" => $sale->customer_phone,
-                'amount' => $sale->total_amount,
-                "items" => $this->getSelsItems($itemSells,$sale->invoice_no)
-            ];
-        }
+        $productSales = ProductSale::with('itemsalse')->get();
+        // $itemSells = ItemSale::with('itemsalse')->get();
+        // dd($productSales);
+        // foreach ($productSales as $sale) {
+        //     $sells[] = [
+        //         "invoice_no" => $sale->invoice_no,
+        //         "name" => $sale->customer_name,
+        //         "phone" => $sale->customer_phone,
+        //         'amount' => $sale->total_amount,
+        //         "items" => $this->getSelsItems($itemSells,$sale->invoice_no)
+        //     ];
+        // }
         
-        return response()->json(["sells" => $sells], 200);
+        return ProductSell::collection($productSales);
     }
 
 
 
     public function store(Request $request)
     {
-        // $product_sell = [];
-        $ids = $request->products;
+        $this->validate($request, [
+            'customer_name' => 'required',
+            'customer_phone' => 'required|max:256'
+        ]);
+        $items = (array) $request->pro;
         $total_amount = 0;
-        $products = Product::all();
-        
-            foreach($ids as $id) {
-                foreach($products as $pro) {
-                    if ($pro->id == $id) {
-                        $total_amount += $pro->price;
-                        $items = [
-                            'invoice_id' => $request->invoiceNo,
-                            'product_id' => $pro->id,
-                            'rate' => "20%",
-                            'quantity' => 1,
-                            "amount" => $pro->price
-                        ];
-                        ItemSale::create($items);
-                    }
 
-                }
+            foreach($items as $it) {
+                $item =(array) $it;
+                $total_amount += $item['price']*$item['qty'];
+                    $hello = [
+                        'invoice_id' => $request->invoiceNo,
+                        'product_id' => $item['id'],
+                        'rate' => "20%",
+                        'quantity' => $item['qty'],
+                        "amount" => $item['price'],
+                    ];
+                    ItemSale::create($hello);
+                               
             }
        
         $product_sell = [
             'invoice_no' => $request->invoiceNo,
-            'customer_name' => $request->name,
-            'customer_phone' => $request->phone,
+            'customer_name' => $request->customer_name,
+            'customer_phone' => $request->customer_phone,
             'total_amount' => $total_amount,
         ];
          ProductSale::create($product_sell);

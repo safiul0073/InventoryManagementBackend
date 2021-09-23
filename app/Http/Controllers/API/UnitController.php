@@ -18,6 +18,10 @@ class UnitController extends Controller
 
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'name' => 'required|max:256',
+            'code'    => 'required'
+        ]);
         Unit::create($request->all());
         return response()->json(["success" => true], 200);
     }
