@@ -102,40 +102,10 @@ class SaleController extends Controller
     }
 
 
-    public function update(Request $request, $id)
-    {
-        ProductSale::findOrFail($id)->update(["name" => $request->name, "description" => $request->description]);
-        return response()->json(["success" => true], 200);
-    }
-
-
     public function destroy($id)
     {
         ProductSale::findOrFail($id)->delete();
         return response()->json(["success" => true], 200);
-    }
-
-
-    public function sellItems (Request $request) {
-        $db_items = [];
-        // $invoice_id = $request->id;
-
-        $sellsItems = ItemSale::all();
-        $products = Product::all();
-        foreach($sellsItems as $item) {
-            
-
-                $db_items[] = [
-                    "product_name" => $this->checkId($products, $item->product_id),
-                    "rate" => $item->rate,
-                    "quantity" => $item->quantity,
-                    "amount" => $item->amount,
-                    "invoice_id" => $item->invoice_id,
-                ];
-            
-    
-    }
-    return response()->json(["sell_items" => $db_items]);
     }
 
 

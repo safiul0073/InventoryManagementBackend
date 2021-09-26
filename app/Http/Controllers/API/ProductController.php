@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductCollection;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
@@ -14,40 +15,12 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
 
-    public function checkId ($items, $id) {
-        
-        foreach ($items as $cat) {
-            if ($cat->id == $id) {
-                return $cat->name;
-            }
-        } 
-    }
     
     public function index()
     {
-        $categorys = Category::all();
-        $units = Unit::all();
-        $db_products = [];
         $products = Product::latest()->get();
-        foreach ($products as $pro) {
 
-            $db_products[] = [
-                "id" => $pro->id,
-                "name" => $pro->name,
-                "image" => $pro->image,
-                'category_id' => $pro->category_id,
-                'unit_id' => $pro->unit_id,
-                "category" => $this->checkId($categorys, $pro->category_id),
-                "unit" => $this->checkId($units, $pro->unit_id),
-                "description" => $pro->description,
-                "code" => $pro->code,
-                "price" => $pro->price,
-                "quantity" => $pro->quantity,
-                "alert_quantity" => $pro->alert_quantity,
-                "status" => $pro->status
-            ];
-        }
-        return response()->json(["products" => $db_products], 200);
+        return ProductCollection::collection($products);
     }
 
 

@@ -8,17 +8,6 @@ use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
 
 
 Route::post('login', [UserController::class, 'login']);
@@ -27,16 +16,18 @@ Route::post('refresh', [UserController::class, 'refresh']);
 Route::get('me', [UserController::class, 'me'])->middleware('auth');
 Route::post('register', [UserController::class, 'register']);
 
-Route::apiResources([
-    'category' => CategoryController::class,
-    'product' => ProductController::class,
-    'unit' => UnitController::class,
-    'product-sell' => SaleController::class,
-]);
+Route::middleware(['auth', ])->group(function () {
+    Route::apiResources([
+        'category' => CategoryController::class,
+        'product' => ProductController::class,
+        'unit' => UnitController::class,
+        'product-sell' => SaleController::class,
+    ]);
+    
+    Route::get('total-sell', [SaleController::class, 'totalOrder']);
+    Route::get('total-items', [SaleController::class, 'totalItems']);
+    Route::get('total-user', [SaleController::class, 'totalUser']);
+});
 
-Route::get('sell-items', [SaleController::class, 'sellItems']);
-Route::get('total-sell', [SaleController::class, 'totalOrder']);
-Route::get('total-items', [SaleController::class, 'totalItems']);
-Route::get('total-user', [SaleController::class, 'totalUser']);
 
 
